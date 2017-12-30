@@ -1,4 +1,4 @@
-class Piece:
+class Piece(object):
     def __init__(self, possible_directions, coordinates, color):
         self.__alive = True
         self.__did_move = False
