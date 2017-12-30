@@ -4,7 +4,7 @@ class Piece(object):
         self.__did_move = False
         self.__possible_directions = possible_directions
         self.__coordinates = coordinates
-        self.color = color
+        self.__color = color
 
     def is_alive(self):
         return self.__alive
@@ -19,7 +19,7 @@ class Piece(object):
         self.__coordinates = (x, y)
 
     def get_color(self):
-        return self.color
+        return self.__color
 
 
 class Bishop(Piece):
