@@ -1,1 +1,3 @@
-colors = {'white': 'WHITE', 'colors': 'BLACK'}
+class Colors:
+    white = 'WHITE'
+    black = 'BLACK'
