@@ -48,3 +48,10 @@ class Board:
 
     def get_pieces(self):
         return self.__pieces
+
+    def remove_piece(self, piece):
+        self.__pieces.pop(piece.get_position())
+
+    def add_piece(self, piece):
+        self.__pieces[piece.get_position()] = piece
+

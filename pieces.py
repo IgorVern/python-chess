@@ -21,6 +21,12 @@ class Piece(object):
     def get_color(self):
         return self.__color
 
+    def get_position(self):
+        return self.__coordinates
+
+    def set_position(self, coordinates):
+        self.__coordinates = coordinates
+
 
 class Bishop(Piece):
     def __init__(self, coordinates, color):
