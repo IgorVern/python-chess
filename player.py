@@ -1,4 +1,4 @@
-from exceptions import WrongPieceException, EmptyCellException
+from exceptions import WrongPieceException, EmptyCellException, BoardOutOfBoundsException
 from pieces import Piece
 
 
@@ -17,3 +17,23 @@ class Player:
 
         self.__picked_piece = piece
 
+    def __validate_move(self, coordinates):
+        x, y = coordinates
+
+        if x < 0 or x > 7 or y < 0 or y > 7:
+            raise BoardOutOfBoundsException()
+
+    def move_piece(self, coordinates):
+        try:
+            self.__validate_move(coordinates)
+        except BoardOutOfBoundsException:
+            self.__picked_piece = None
+            raise BoardOutOfBoundsException()
+
+        piece = self.__picked_piece
+
+        self.__board.remove_piece(piece.get_position())
+        self.__picked_piece.set_position(coordinates)
+        self.__board.add_piece(piece)
+
+        self.__picked_piece = None
