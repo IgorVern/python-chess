@@ -33,7 +33,7 @@ class Player:
         piece = self.__picked_piece
 
         self.__board.remove_piece(piece.get_position())
-        self.__picked_piece.set_position(coordinates)
+        self.__picked_piece.move(coordinates)
         self.__board.add_piece(piece)
 
         self.__picked_piece = None
