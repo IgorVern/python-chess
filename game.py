@@ -1,13 +1,20 @@
 from board import Board
-from output import ConsoleOutput
+from player import Player
+from const import Colors
+import os
 
 
-def start_game():
-    board = Board()
-    output = ConsoleOutput()
+class Game:
+    def __init__(self, output):
+        board = Board()
+        self.__board = board
+        self.__output = output
+        self.__white_player = Player(board, Colors.white)
+        self.__black_player = Player(board, Colors.black)
+        print(os.linesep)
+        print('===== Welcome to python chess! =====')
+        print(os.linesep)
 
-    output.update_field(board.get_pieces())
-    output.render()
-
-
-start_game()
+    def start_game(self):
+        self.__output.update_field(self.__board.get_pieces())
+        self.__output.render()
