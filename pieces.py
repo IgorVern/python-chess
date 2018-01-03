@@ -24,6 +24,12 @@ class Piece(object):
 
         self.__coordinates = coordinates
 
+    def set_move_directions(self, directions):
+        self.__possible_directions = directions
+
+    def is_moved(self):
+        return self.__did_move
+
 
 class Bishop(Piece):
     def __init__(self, coordinates, color):
@@ -52,11 +58,11 @@ class Pawn(Piece):
         super(Pawn, self).__init__(self.__move_directions, coordinates, color)
 
     def move(self, coordinates):
-        if not self.__did_move:
-            self.__did_move = True
-            self.__move_directions = [(0, 1)]
+        did_move = self.is_moved()
+        if not did_move:
+            self.set_move_directions([(0, 1)])
 
-        self.__coordinates = coordinates
+        super(Pawn, self).move(coordinates)
 
 
 class Queen(Piece):

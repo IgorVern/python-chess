@@ -3,14 +3,7 @@ class Input(object):
         pass
 
     @staticmethod
-    def transform_input(data):
-        coords = data.split()
-        coordinates = []
+    def transform_input(coords):
         """replace chars with ints"""
-        for c in coords:
-            coordinates.append(int(c.replace(c[0], str(ord(c[0]) - 96), 1)))
-
-        return tuple(coordinates)
-
-    def get_user_input(self):
-        pass
+        coords = coords.replace(coords[0], str(ord(coords[0]) - 96), 1)
+        return tuple([int(coords[0]) - 1, 8 - int(coords[1])])

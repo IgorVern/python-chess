@@ -37,3 +37,6 @@ class Player:
         self.__board.add_piece(piece)
 
         self.__picked_piece = None
+
+    def get_color(self):
+        return self.__color
