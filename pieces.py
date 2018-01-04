@@ -1,10 +1,11 @@
 class Piece(object):
-    def __init__(self, possible_directions, coordinates, color):
+    def __init__(self, directions, coordinates, color, step=None):
         self.__alive = True
         self.__did_move = False
-        self.__possible_directions = possible_directions
+        self.__directions = directions
         self.__coordinates = coordinates
         self.__color = color
+        self.__step = step
 
     def is_alive(self):
         return self.__alive
@@ -25,63 +26,57 @@ class Piece(object):
         self.__coordinates = coordinates
 
     def set_move_directions(self, directions):
-        self.__possible_directions = directions
+        self.__directions = directions
 
     def is_moved(self):
         return self.__did_move
 
+    def set_step(self, step):
+        self.__step = step
+
+    def get_step(self):
+        return self.__step
+
 
 class Bishop(Piece):
     def __init__(self, coordinates, color):
-        self.__move_directions = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7),
-                                  (-1, 1), (-2, 2), (-3, 3), (-4, 4), (-5, 5), (-6, 6), (-7, 7),
-                                  (1, -1), (2, -2), (3, -3), (4, -4), (5, -5), (6, -6), (7, -7),
-                                  (-1, -1), (-2, -2), (-3, -3), (-4, -4), (-5, -5), (-6, -6), (-7, -7)]
-        super(Bishop, self).__init__(self.__move_directions, coordinates, color)
+        directions = [(1, 1), (-1, 1), (1, -1), (-1, -1)]
+        super(Bishop, self).__init__(directions, coordinates, color)
 
 
 class King(Piece):
     def __init__(self, coordinates, color):
-        self.__move_directions = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
-        super(King, self).__init__(self.__move_directions, coordinates, color)
+        directions = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+        super(King, self).__init__(directions, coordinates, color, 1)
 
 
 class Knight(Piece):
     def __init__(self, coordinates, color):
-        self.__move_directions = [(2, 1), (1, 2), (-2, 1), (-1, 2), (2, -1), (1, -2), (-2, -1), (-1, -2)]
-        super(Knight, self).__init__(self.__move_directions, coordinates, color)
+        directions = [(2, 1), (1, 2), (-2, 1), (-1, 2), (2, -1), (1, -2), (-2, -1), (-1, -2)]
+        super(Knight, self).__init__(directions, coordinates, color, 1)
 
 
 class Pawn(Piece):
     def __init__(self, coordinates, color):
-        self.__move_directions = [(0, 1), (0, 2)]
-        super(Pawn, self).__init__(self.__move_directions, coordinates, color)
+        directions = [(0, 1), (0, 2)]
+        super(Pawn, self).__init__(directions, coordinates, color, 2)
 
     def move(self, coordinates):
         did_move = self.is_moved()
         if not did_move:
             self.set_move_directions([(0, 1)])
+            self.set_step(1)
 
         super(Pawn, self).move(coordinates)
 
 
 class Queen(Piece):
     def __init__(self, coordinates, color):
-        self.__move_directions = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7),
-                                  (-1, 1), (-2, 2), (-3, 3), (-4, 4), (-5, 5), (-6, 6), (-7, 7),
-                                  (1, -1), (2, -2), (3, -3), (4, -4), (5, -5), (6, -6), (7, -7),
-                                  (-1, -1), (-2, -2), (-3, -3), (-4, -4), (-5, -5), (-6, -6), (-7, -7),
-                                  (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
-                                  (-1, 0), (-2, 0), (-3, 0), (-4, 0), (-5, 0), (-6, 0), (-7, 0),
-                                  (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7),
-                                  (0, -1), (0, -2), (0, -3), (0, -4), (0, -5), (0, -6), (0, -7)]
-        super(Queen, self).__init__(self.__move_directions, coordinates, color)
+        directions = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+        super(Queen, self).__init__(directions, coordinates, color)
 
 
 class Rook(Piece):
     def __init__(self, coordinates, color):
-        self.__move_directions = [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
-                                  (-1, 0), (-2, 0), (-3, 0), (-4, 0), (-5, 0), (-6, 0), (-7, 0),
-                                  (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7),
-                                  (0, -1), (0, -2), (0, -3), (0, -4), (0, -5), (0, -6), (0, -7)]
-        super(Rook, self).__init__(self.__move_directions, coordinates, color)
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        super(Rook, self).__init__(directions, coordinates, color)
