@@ -44,14 +44,17 @@ class Board:
 
         in_game_pieces[(4, 7)] = pieces.Queen((4, 7), color)
 
-        self.__pieces = in_game_pieces
+        """
+            board is represented as a dictionary where values is a piece object, key - its coordinates tuple
+        """
+        self.__board = in_game_pieces
 
-    def get_pieces(self):
-        return self.__pieces
+    def get_board(self):
+        return self.__board
 
     def remove_piece(self, piece_coords):
-        self.__pieces.pop(piece_coords)
+        self.__board.pop(piece_coords)
 
     def add_piece(self, piece):
-        self.__pieces[piece.get_position()] = piece
+        self.__board[piece.get_position()] = piece
 

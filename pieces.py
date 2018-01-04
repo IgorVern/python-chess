@@ -1,5 +1,5 @@
 class Piece(object):
-    def __init__(self, directions, coordinates, color, step=None):
+    def __init__(self, directions, coordinates, color, step=7):
         self.__alive = True
         self.__did_move = False
         self.__directions = directions
@@ -25,8 +25,11 @@ class Piece(object):
 
         self.__coordinates = coordinates
 
-    def set_move_directions(self, directions):
+    def set_movement_directions(self, directions):
         self.__directions = directions
+
+    def get_movement_directions(self):
+        return self.__directions
 
     def is_moved(self):
         return self.__did_move
@@ -64,7 +67,7 @@ class Pawn(Piece):
     def move(self, coordinates):
         did_move = self.is_moved()
         if not did_move:
-            self.set_move_directions([(0, 1)])
+            self.set_movement_directions([(0, 1)])
             self.set_step(1)
 
         super(Pawn, self).move(coordinates)

@@ -52,7 +52,7 @@ class ConsoleOutput(Output):
     def render(self):
         print(self.get_output())
 
-    def update_field(self, board):
+    def update_field(self, board, picked_piece=None, highlighted_cells=None):
         field = list(self.get_empty_field())
 
         for coordinates, piece in board.items():
