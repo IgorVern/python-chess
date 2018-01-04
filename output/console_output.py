@@ -8,29 +8,38 @@ class ConsoleOutput(Output):
 
     def __init__(self):
         self.__symbols = PiecesSymbols()
+        self.__picked_piece = None
+        self.__highlighted_cells = None
         super(ConsoleOutput, self).__init__()
 
-    @staticmethod
-    def __transform_cell(cell):
-        if cell is None:
-            return u'|   '
-        color = cell.get_color()
+    def __get_row(self, row):
+        result_row = []
+        
+        for cell in row:
+            if cell is None:
+                result_row.append(u'|   ')
+                continue
+    
+            color = cell.get_color()
+            pieces_symbols = PiecesSymbols.black if color == Colors.black else PiecesSymbols.white
+    
+            cell_prefix = '| '
+            cell_suffix = ' '
+            if type(cell) is King:
+                result_row.append(cell_prefix + pieces_symbols['king'] + cell_suffix)
+            elif type(cell) is Queen:
+                result_row.append(cell_prefix + pieces_symbols['queen'] + cell_suffix)
+            elif type(cell) is Rook:
+                result_row.append(cell_prefix + pieces_symbols['rook'] + cell_suffix)
+            elif type(cell) is Bishop:
+                result_row.append(cell_prefix + pieces_symbols['bishop'] + cell_suffix)
+            elif type(cell) is Knight:
+                result_row.append(cell_prefix + pieces_symbols['knight'] + cell_suffix)
+            elif type(cell) is Pawn:
+                result_row.append(cell_prefix + pieces_symbols['pawn'] + cell_suffix)
 
-        pieces_symbols = PiecesSymbols.black if color == Colors.black else PiecesSymbols.white
-
-        if type(cell) is King:
-            return '| ' + pieces_symbols['king'] + ' '
-        elif type(cell) is Queen:
-            return '| ' + pieces_symbols['queen'] + ' '
-        elif type(cell) is Rook:
-            return '| ' + pieces_symbols['rook'] + ' '
-        elif type(cell) is Bishop:
-            return '| ' + pieces_symbols['bishop'] + ' '
-        elif type(cell) is Knight:
-            return '| ' + pieces_symbols['knight'] + ' '
-        elif type(cell) is Pawn:
-            return '| ' + pieces_symbols['pawn'] + ' '
-
+        return result_row
+        
     def get_output(self):
         row_numbers = tuple(9 - i for i in range(1, 9))
         line = '_' * 37
@@ -40,7 +49,7 @@ class ConsoleOutput(Output):
         for index, row in enumerate(self.get_field()):
             row_number = str(row_numbers[index])
             transformed_row = [row_number + ' ']
-            transformed_row.extend(list(map(self.__transform_cell, row)))
+            transformed_row.extend(self.__get_row(row))
             transformed_row.append('| ' + row_number)
             output.append(''.join(transformed_row))
             output.append(line)
@@ -54,6 +63,8 @@ class ConsoleOutput(Output):
 
     def update_field(self, board, picked_piece=None, highlighted_cells=None):
         field = list(self.get_empty_field())
+        self.__picked_piece = picked_piece
+        self.__highlighted_cells = highlighted_cells
 
         for coordinates, piece in board.items():
             x, y = coordinates
