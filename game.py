@@ -75,32 +75,43 @@ class Game:
                 print("You can't move here")
                 continue
 
-            if direction_coordinates in board:
-                target_cell = board.get(direction_coordinates)
+            self.__kill_someone(board, direction_coordinates)
 
-                if type(target_cell) is King:
-                    self.__game_is_ended = True
-
-                self.__board.remove_piece(direction_coordinates)
-
-            """determine if there was an en passant move"""
-            if type(piece) is Pawn and self.__en_passant_pawn:
-                x, y = self.__en_passant_pawn.get_position()
-                en_passant_coords = (x, y - 1 if self.__current_player_color == Colors.white else y + 1)
-                if en_passant_coords in movement_paths:
-                    direction_coordinates = en_passant_coords
-                    self.__board.remove_piece((x, y))
-                    print('Capture ' + transform_coordinates((x, y)) + ' en passant')
-
-            """is piece suitable for en passant move"""
             if type(piece) is Pawn:
-                current_position = piece.get_position()
-                self.__en_passant_pawn = piece if abs(direction_coordinates[1] - current_position[1]) == 2 else None
+                direction_coordinates = self.__get_piece_eventual_position(movement_paths, direction_coordinates)
+                self.__set_en_passant_piece(piece, direction_coordinates)
             else:
                 self.__en_passant_pawn = None
 
             player.move_piece(direction_coordinates)
             break
+
+    def __kill_someone(self, board, direction_coordinates):
+        if direction_coordinates in board:
+            target_cell = board.get(direction_coordinates)
+
+            if type(target_cell) is King:
+                self.__game_is_ended = True
+
+            self.__board.remove_piece(direction_coordinates)
+
+    def __get_piece_eventual_position(self, movement_paths, direction_coordinates):
+        dc = direction_coordinates
+        """determine if there was an en passant move"""
+        if self.__en_passant_pawn:
+            x, y = self.__en_passant_pawn.get_position()
+            en_passant_coords = (x, y - 1 if self.__current_player_color == Colors.white else y + 1)
+            if en_passant_coords in movement_paths:
+                dc = en_passant_coords
+                self.__board.remove_piece((x, y))
+                print('Capture ' + transform_coordinates((x, y)) + ' en passant')
+
+        return dc
+
+    def __set_en_passant_piece(self, pawn, direction_coordinates):
+        """is piece suitable for en passant move"""
+        current_position = pawn.get_position()
+        self.__en_passant_pawn = pawn if abs(direction_coordinates[1] - current_position[1]) == 2 else None
 
     def __switch_player(self):
         self.__current_player_color = Colors.white if self.__current_player_color == Colors.black else Colors.black
