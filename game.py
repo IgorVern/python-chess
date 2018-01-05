@@ -82,6 +82,8 @@ class Game:
                 target_position = self.__get_piece_eventual_position(movement_paths, target_position)
                 self.__set_en_passant_piece(piece, target_position)
                 self.__promote_pawn(piece, target_position)
+            elif type(piece) is King:
+                castle_positions = self.__get_castling_positions(piece, board)
             else:
                 self.__en_passant_pawn = None
 
@@ -219,6 +221,22 @@ class Game:
                 enemy_coords.append(en_passant_hit_direction)
 
         return enemy_coords
+
+    def __get_castling_positions(self, king, board):
+        castling_positions = []
+        color = self.__current_player_color
+
+        if king.is_moved():
+            return castling_positions
+
+        rooks = {k: v for k, v in board.items() if type(v) is Rook and not v.is_moved() and v.get_color() == color}
+        rooks = list(rooks.values())
+
+        print(rooks)
+        if not rooks:
+            return castling_positions
+
+        return castling_positions
 
     @staticmethod
     def __are_coordinates_in_bounds(coordinates):
