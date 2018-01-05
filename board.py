@@ -49,6 +49,7 @@ class Board:
         """
         self.__board = in_game_pieces
 
+    # TODO  name refactoring
     def get_board(self):
         return self.__board
 

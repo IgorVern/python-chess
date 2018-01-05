@@ -69,10 +69,11 @@ class ConsoleOutput(Output):
 
         return os.linesep.join(output)
 
-    def render(self):
+    def render(self, board, picked_piece=None, highlighted_cells=None):
+        self.__update_field(board, picked_piece, highlighted_cells)
         print(self.get_output())
 
-    def update_field(self, board, picked_piece=None, highlighted_cells=None):
+    def __update_field(self, board, picked_piece, highlighted_cells):
         field = list(self.get_empty_field())
         self.__picked_piece = picked_piece
         self.__highlighted_cells = highlighted_cells

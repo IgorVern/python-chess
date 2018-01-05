@@ -24,12 +24,6 @@ class Player:
             raise BoardOutOfBoundsException()
 
     def move_piece(self, coordinates):
-        try:
-            self.__validate_move(coordinates)
-        except BoardOutOfBoundsException:
-            self.__picked_piece = None
-            raise BoardOutOfBoundsException()
-
         piece = self.__picked_piece
 
         self.__board.remove_piece(piece.get_position())

@@ -1,7 +1,9 @@
 from board import Board
 from player import Player
 from const import Colors
-from pieces import Piece
+from pieces import Piece, King
+from exceptions import *
+from utils import transform_coordinates
 import os
 
 
@@ -13,37 +15,78 @@ class Game:
         self.__input = user_input
         self.__players = {Colors.white: Player(board, Colors.white), Colors.black: Player(board, Colors.black)}
         self.__current_player_color = Colors.white
-        self.__in_game = True
+        self.__game_is_ended = False
         print(os.linesep)
         print('===== Welcome to python chess! =====')
         print(os.linesep)
 
     def start_game(self):
-        while self.__in_game:
+        while True:
             board = self.__board.get_board()
             player = self.__players.get(self.__current_player_color)
 
-            self.__output.update_field(board)
-            self.__output.render()
+            self.__output.render(board)
 
-            print(player.get_color() + ' player turn')
+            print(self.__current_player_color + ' player turn')
 
-            piece_coordinates = self.__input.get_user_input('Pick a piece:' + os.linesep)
-            piece = board.get(piece_coordinates)
-
-            player.pick_piece(piece)
+            piece = self.__get_piece(board, player)
 
             movement_paths = self.__compute_movement_paths(piece)
 
-            print(movement_paths)
+            self.__output.render(board, piece, movement_paths)
 
-            self.__output.update_field(board, piece, movement_paths)
-            self.__output.render()
+            self.__move_piece(board, player, movement_paths)
 
-            direction_coordinates = self.__input.get_user_input('Move piece:' + os.linesep)
+            if self.__game_is_ended:
+                print(self.__current_player_color + ' wins')
+                break
+
+            self.__switch_player()
+
+    # TODO   move cell validation logic in game class. Game rules determine players behavior
+    def __get_piece(self, board, player):
+        while True:
+            try:
+                piece_coordinates = self.__input.get_user_input('Pick a piece:' + os.linesep)
+            except BoardOutOfBoundsException:
+                print('There is no such cell on board')
+                continue
+
+            piece = board.get(piece_coordinates)
+
+            try:
+                player.pick_piece(piece)
+                return piece
+            except WrongPieceException:
+                print(transform_coordinates(piece_coordinates) + ' is not your piece')
+            except EmptyCellException:
+                print('There is no piece at ' + transform_coordinates(piece_coordinates))
+
+    def __move_piece(self, board, player, movement_paths):
+        while True:
+            try:
+                direction_coordinates = self.__input.get_user_input('Move piece:' + os.linesep)
+            except BoardOutOfBoundsException:
+                print('There is no such cell on board')
+                continue
+
+            if direction_coordinates not in movement_paths:
+                print("You can't move here")
+                continue
+
+            if direction_coordinates in board:
+                piece = board.get(direction_coordinates)
+
+                if type(piece) is King:
+                    self.__game_is_ended = True
+
+                self.__board.remove_piece(direction_coordinates)
+
             player.move_piece(direction_coordinates)
+            break
 
-            self.__current_player_color = Colors.white if self.__current_player_color == Colors.black else Colors.black
+    def __switch_player(self):
+        self.__current_player_color = Colors.white if self.__current_player_color == Colors.black else Colors.black
 
     def __compute_movement_paths(self, piece):
         movement_directions = piece.get_movement_directions()

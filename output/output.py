@@ -19,8 +19,5 @@ class Output(object):
     def set_field(self, field):
         self.__field = field
 
-    def update_field(self, board, picked_piece=None, highlighted_cells=None):
-        pass
-
     def get_output(self):
         pass
