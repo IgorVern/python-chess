@@ -16,6 +16,7 @@ class Game:
         self.__players = {Colors.white: Player(board, Colors.white), Colors.black: Player(board, Colors.black)}
         self.__current_player_color = Colors.white
         self.__game_is_ended = False
+        self.__en_passant_pawn = None
         print(os.linesep)
         print('===== Welcome to python chess! =====')
         print(os.linesep)
@@ -35,7 +36,7 @@ class Game:
 
             self.__output.render(board, piece, movement_paths)
 
-            self.__move_piece(board, player, movement_paths)
+            self.__move_piece(board, piece, player, movement_paths)
 
             if self.__game_is_ended:
                 print(self.__current_player_color + ' wins')
@@ -62,7 +63,7 @@ class Game:
             except EmptyCellException:
                 print('There is no piece at ' + transform_coordinates(piece_coordinates))
 
-    def __move_piece(self, board, player, movement_paths):
+    def __move_piece(self, board, piece, player, movement_paths):
         while True:
             try:
                 direction_coordinates = self.__input.get_user_input('Move piece:' + os.linesep)
@@ -75,12 +76,28 @@ class Game:
                 continue
 
             if direction_coordinates in board:
-                piece = board.get(direction_coordinates)
+                target_cell = board.get(direction_coordinates)
 
-                if type(piece) is King:
+                if type(target_cell) is King:
                     self.__game_is_ended = True
 
                 self.__board.remove_piece(direction_coordinates)
+
+            """determine if there was an en passant move"""
+            if type(piece) is Pawn and self.__en_passant_pawn:
+                x, y = self.__en_passant_pawn.get_position()
+                en_passant_coords = (x, y - 1 if self.__current_player_color == Colors.white else y + 1)
+                if en_passant_coords in movement_paths:
+                    direction_coordinates = en_passant_coords
+                    self.__board.remove_piece((x, y))
+                    print('Capture ' + transform_coordinates((x, y)) + ' en passant')
+
+            """is piece suitable for en passant move"""
+            if type(piece) is Pawn:
+                current_position = piece.get_position()
+                self.__en_passant_pawn = piece if abs(direction_coordinates[1] - current_position[1]) == 2 else None
+            else:
+                self.__en_passant_pawn = None
 
             player.move_piece(direction_coordinates)
             break
@@ -116,6 +133,19 @@ class Game:
         if type(piece) is Pawn:
             enemy_coords = self.__get_pawn_enemy_coordinates(piece, board)
             directions.extend(enemy_coords)
+
+            """compute pawn en passant move"""
+            if self.__en_passant_pawn is not None:
+                en_passant_hit_direction = None
+                x, y = current_position
+                en_passant_coords = self.__en_passant_pawn.get_position()
+                if en_passant_coords == (x - 1, y):
+                    en_passant_hit_direction = (x - 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
+                elif en_passant_coords == (x + 1, y):
+                    en_passant_hit_direction = (x + 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
+
+                if en_passant_hit_direction and en_passant_hit_direction not in enemy_coords:
+                    directions.append(en_passant_hit_direction)
 
         return directions
 
