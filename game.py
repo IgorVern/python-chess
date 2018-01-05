@@ -17,6 +17,7 @@ class Game:
         self.__current_player_color = Colors.white
         self.__game_is_ended = False
         self.__en_passant_pawn = None
+        self.__pawn_was_promoted = False
         print(os.linesep)
         print('===== Welcome to python chess! =====')
         print(os.linesep)
@@ -84,7 +85,11 @@ class Game:
             else:
                 self.__en_passant_pawn = None
 
-            player.move_piece(target_position)
+            if self.__pawn_was_promoted:
+                self.__pawn_was_promoted = False
+            else:
+                player.move_piece(target_position)
+
             break
 
     def __kill_someone(self, board, target_position):
@@ -113,10 +118,7 @@ class Game:
         x, y = target_position
         color = self.__current_player_color
 
-        print('promote')
-        print(target_position)
         if y == 0 or y == 7:
-            print('promoting')
             while True:
                 piece_name = self.__input.get_pawn_promotion_input().lower()
                 new_piece = None
@@ -133,6 +135,7 @@ class Game:
                     continue
                 self.__board.remove_piece(pawn.get_position())
                 self.__board.add_piece(new_piece)
+                self.__pawn_was_promoted = True
                 break
 
     def __set_en_passant_piece(self, pawn, target_position):
@@ -198,7 +201,7 @@ class Game:
             if cell is None:
                 return
 
-            if cell.get_color() == Colors.black:
+            if cell.get_color() != self.__current_player_color:
                 enemy_coords.append(possible_enemy_coords)
 
         if self.__current_player_color == Colors.white:
