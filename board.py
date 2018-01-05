@@ -6,7 +6,7 @@ class Board:
     def __init__(self):
         in_game_pieces = {}
 
-        """fill board with white pieces"""
+        """fill board with black pieces"""
         color = Colors.black
         # for x in range(0, 8):
         #     coords = (x, 1)
@@ -25,7 +25,7 @@ class Board:
 
         in_game_pieces[(4, 0)] = pieces.Queen((4, 0), color)
         
-        """fill board with black pieces"""
+        """fill board with white pieces"""
         color = Colors.white
         # for x in range(0, 8):
         #     coords = (x, 6)
