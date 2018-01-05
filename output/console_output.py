@@ -12,19 +12,30 @@ class ConsoleOutput(Output):
         self.__highlighted_cells = None
         super(ConsoleOutput, self).__init__()
 
-    def __get_row(self, row):
+    def __get_row(self, row, y):
         result_row = []
-        
-        for cell in row:
+        for x, cell in enumerate(row):
             if cell is None:
-                result_row.append(u'|   ')
+                row_cell = u'|   '
+                if self.__highlighted_cells and (x, y) in self.__highlighted_cells:
+                    row_cell = u'| * '
+
+                result_row.append(row_cell)
                 continue
-    
+
             color = cell.get_color()
             pieces_symbols = PiecesSymbols.black if color == Colors.black else PiecesSymbols.white
-    
+
             cell_prefix = '| '
             cell_suffix = ' '
+
+            if self.__picked_piece is cell:
+                cell_prefix = '|['
+                cell_suffix = ']'
+            elif self.__highlighted_cells and cell.get_position() in self.__highlighted_cells:
+                cell_prefix = '|-'
+                cell_suffix = '-'
+
             if type(cell) is King:
                 result_row.append(cell_prefix + pieces_symbols['king'] + cell_suffix)
             elif type(cell) is Queen:
@@ -39,7 +50,7 @@ class ConsoleOutput(Output):
                 result_row.append(cell_prefix + pieces_symbols['pawn'] + cell_suffix)
 
         return result_row
-        
+
     def get_output(self):
         row_numbers = tuple(9 - i for i in range(1, 9))
         line = '_' * 37
@@ -49,7 +60,7 @@ class ConsoleOutput(Output):
         for index, row in enumerate(self.get_field()):
             row_number = str(row_numbers[index])
             transformed_row = [row_number + ' ']
-            transformed_row.extend(self.__get_row(row))
+            transformed_row.extend(self.__get_row(row, 8 - row_numbers[index]))
             transformed_row.append('| ' + row_number)
             output.append(''.join(transformed_row))
             output.append(line)
