@@ -166,6 +166,8 @@ class Game:
                 if isinstance(board_cell, Piece):
                     if board_cell.get_color() == self.__current_player_color:
                         break
+                    if type(board_cell) is Pawn:
+                        break
                     directions.append(possible_position)
                     break
 
@@ -174,19 +176,6 @@ class Game:
         if type(piece) is Pawn:
             enemy_coords = self.__get_pawn_enemy_coordinates(piece, board)
             directions.extend(enemy_coords)
-
-            """compute pawn en passant move"""
-            if self.__en_passant_pawn is not None:
-                en_passant_hit_direction = None
-                x, y = current_position
-                en_passant_coords = self.__en_passant_pawn.get_position()
-                if en_passant_coords == (x - 1, y):
-                    en_passant_hit_direction = (x - 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
-                elif en_passant_coords == (x + 1, y):
-                    en_passant_hit_direction = (x + 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
-
-                if en_passant_hit_direction and en_passant_hit_direction not in enemy_coords:
-                    directions.append(en_passant_hit_direction)
 
         return directions
 
@@ -214,6 +203,20 @@ class Game:
 
             add_enemy((x - 1, y + 1))
             add_enemy((x + 1, y + 1))
+
+        """compute pawn en passant move"""
+        if self.__en_passant_pawn is not None:
+            current_position = pawn.get_position()
+            en_passant_hit_direction = None
+            x, y = current_position
+            en_passant_coords = self.__en_passant_pawn.get_position()
+            if en_passant_coords == (x - 1, y):
+                en_passant_hit_direction = (x - 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
+            elif en_passant_coords == (x + 1, y):
+                en_passant_hit_direction = (x + 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
+
+            if en_passant_hit_direction and en_passant_hit_direction not in enemy_coords:
+                enemy_coords.append(en_passant_hit_direction)
 
         return enemy_coords
 
