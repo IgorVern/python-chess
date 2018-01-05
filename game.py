@@ -59,10 +59,14 @@ class Game:
                 x1, y1 = possible_position
                 possible_position = (x1 + x, y1 + y)
 
-                if self.__is_coordinates_in_bounds(possible_position):
+                if self.__is_not_coordinates_in_bounds(possible_position):
                     break
 
-                if not self.__is_cell_free_or_hitable(board.get(possible_position)):
+                board_cell = board.get(possible_position)
+                if isinstance(board_cell, Piece):
+                    if board_cell.get_color() == self.__current_player_color:
+                        break
+                    directions.append(possible_position)
                     break
 
                 directions.append(possible_position)
@@ -70,13 +74,6 @@ class Game:
         return directions
 
     @staticmethod
-    def __is_coordinates_in_bounds(coordinates):
+    def __is_not_coordinates_in_bounds(coordinates):
         x, y = coordinates
         return x > 7 or x < 0 or y > 7 or y < 0
-
-    def __is_cell_free_or_hitable(self, cell):
-        if isinstance(cell, Piece):
-            if cell.get_color() == self.__current_player_color:
-                return False
-
-        return True
