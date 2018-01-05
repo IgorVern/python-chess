@@ -8,9 +8,9 @@ class Board:
 
         """fill board with black pieces"""
         color = Colors.black
-        # for x in range(0, 8):
-        #     coords = (x, 1)
-        #     in_game_pieces[coords] = pieces.Pawn(coords, color)
+        for x in range(0, 8):
+            coords = (x, 1)
+            in_game_pieces[coords] = pieces.Pawn(coords, color)
 
         in_game_pieces[(0, 0)] = pieces.Rook((0, 0), color)
         in_game_pieces[(7, 0)] = pieces.Rook((7, 0), color)
@@ -27,9 +27,9 @@ class Board:
         
         """fill board with white pieces"""
         color = Colors.white
-        # for x in range(0, 8):
-        #     coords = (x, 6)
-        #     in_game_pieces[coords] = pieces.Pawn(coords, color)
+        for x in range(0, 8):
+            coords = (x, 6)
+            in_game_pieces[coords] = pieces.Pawn(coords, color)
 
         in_game_pieces[(0, 7)] = pieces.Rook((0, 7), color)
         in_game_pieces[(7, 7)] = pieces.Rook((7, 7), color)

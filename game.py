@@ -1,7 +1,7 @@
 from board import Board
 from player import Player
 from const import Colors
-from pieces import Piece, King
+from pieces import Piece, King, Pawn
 from exceptions import *
 from utils import transform_coordinates
 import os
@@ -31,7 +31,7 @@ class Game:
 
             piece = self.__get_piece(board, player)
 
-            movement_paths = self.__compute_movement_paths(piece)
+            movement_paths = self.__compute_movement_paths(board, piece)
 
             self.__output.render(board, piece, movement_paths)
 
@@ -88,11 +88,10 @@ class Game:
     def __switch_player(self):
         self.__current_player_color = Colors.white if self.__current_player_color == Colors.black else Colors.black
 
-    def __compute_movement_paths(self, piece):
+    def __compute_movement_paths(self, board, piece):
         movement_directions = piece.get_movement_directions()
         step = piece.get_step()
         current_position = piece.get_position()
-        board = self.__board.get_board()
         directions = []
 
         for direction in movement_directions:
@@ -102,7 +101,7 @@ class Game:
                 x1, y1 = possible_position
                 possible_position = (x1 + x, y1 + y)
 
-                if self.__is_not_coordinates_in_bounds(possible_position):
+                if not self.__are_coordinates_in_bounds(possible_position):
                     break
 
                 board_cell = board.get(possible_position)
@@ -114,9 +113,40 @@ class Game:
 
                 directions.append(possible_position)
 
+        if type(piece) is Pawn:
+            enemy_coords = self.__get_pawn_enemy_coordinates(piece, board)
+            directions.extend(enemy_coords)
+
         return directions
 
+    def __get_pawn_enemy_coordinates(self, pawn, board):
+        enemy_coords = []
+
+        def add_enemy(possible_enemy_coords):
+            if not self.__are_coordinates_in_bounds(possible_enemy_coords):
+                return
+
+            cell = board.get(possible_enemy_coords)
+            if cell is None:
+                return
+
+            if cell.get_color() == Colors.black:
+                enemy_coords.append(possible_enemy_coords)
+
+        if self.__current_player_color == Colors.white:
+            x, y = pawn.get_position()
+
+            add_enemy((x - 1, y - 1))
+            add_enemy((x + 1, y - 1))
+        else:
+            x, y = pawn.get_position()
+
+            add_enemy((x - 1, y + 1))
+            add_enemy((x + 1, y + 1))
+
+        return enemy_coords
+
     @staticmethod
-    def __is_not_coordinates_in_bounds(coordinates):
+    def __are_coordinates_in_bounds(coordinates):
         x, y = coordinates
-        return x > 7 or x < 0 or y > 7 or y < 0
+        return x < 8 or x >= 0 or y < 8 or y >= 0

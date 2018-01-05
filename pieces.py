@@ -1,3 +1,6 @@
+from const import Colors
+
+
 class Piece(object):
     def __init__(self, directions, coordinates, color, step=7):
         self.__alive = True
@@ -61,13 +64,12 @@ class Knight(Piece):
 
 class Pawn(Piece):
     def __init__(self, coordinates, color):
-        directions = [(0, 1), (0, 2)]
+        directions = [(0, 1)] if color == Colors.black else [(0, -1)]
         super(Pawn, self).__init__(directions, coordinates, color, 2)
 
     def move(self, coordinates):
         did_move = self.is_moved()
         if not did_move:
-            self.set_movement_directions([(0, 1)])
             self.set_step(1)
 
         super(Pawn, self).move(coordinates)
