@@ -79,11 +79,9 @@ class Game:
             self.__kill_someone(board, target_position)
 
             if type(piece) is Pawn:
-                target_position = self.__get_piece_eventual_position(movement_paths, target_position)
+                target_position = self.__get_pawn_eventual_position(movement_paths, target_position)
                 self.__set_en_passant_piece(piece, target_position)
                 self.__promote_pawn(piece, target_position)
-            elif type(piece) is King:
-                castle_positions = self.__get_castling_positions(piece, board)
             else:
                 self.__en_passant_pawn = None
 
@@ -103,7 +101,7 @@ class Game:
 
             self.__board.remove_piece(target_position)
 
-    def __get_piece_eventual_position(self, movement_paths, target_position):
+    def __get_pawn_eventual_position(self, movement_paths, target_position):
         tp = target_position
         """determine if there was an en passant move"""
         if self.__en_passant_pawn:
