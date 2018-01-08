@@ -8,3 +8,7 @@ class EmptyCellException(Exception):
 
 class BoardOutOfBoundsException(Exception):
     pass
+
+
+class InputValidationException(Exception):
+    pass

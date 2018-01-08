@@ -24,7 +24,7 @@ class Board:
         in_game_pieces[(3, 0)] = pieces.King((3, 0), color)
 
         in_game_pieces[(4, 0)] = pieces.Queen((4, 0), color)
-        
+
         """fill board with white pieces"""
         color = Colors.white
         for x in range(0, 8):
@@ -58,4 +58,3 @@ class Board:
 
     def add_piece(self, piece):
         self.__board[piece.get_position()] = piece
-
