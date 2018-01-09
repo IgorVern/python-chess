@@ -10,6 +10,7 @@ import os
 class Game:
     def __init__(self, user_output, user_input):
         board = Board()
+        board.fill_board()
         self.__board = board
         self.__output = user_output
         self.__input = user_input

@@ -1,10 +1,11 @@
 class Piece(object):
-    def __init__(self, directions, coordinates, color, step=7):
+    def __init__(self, board, directions, coordinates, color, step=7):
         self.__did_move = False
         self.__directions = directions
         self.__coordinates = coordinates
         self.__color = color
         self.__step = step
+        self.__board = board
 
     def get_color(self):
         return self.__color
