@@ -1,7 +1,7 @@
+import pieces
 from board import Board
 from player import Player
 from const import Colors
-from pieces import *
 from exceptions import *
 from utils import transform_coordinates
 import os
@@ -78,7 +78,7 @@ class Game:
 
             self.__kill_someone(board, target_position)
 
-            if type(piece) is Pawn:
+            if type(piece) is pieces.Pawn:
                 target_position = self.__get_pawn_eventual_position(movement_paths, target_position)
                 self.__set_en_passant_piece(piece, target_position)
                 self.__promote_pawn(piece, target_position)
@@ -96,7 +96,7 @@ class Game:
         if target_position in board:
             target_cell = board.get(target_position)
 
-            if type(target_cell) is King:
+            if type(target_cell) is pieces.King:
                 self.__game_is_ended = True
 
             self.__board.remove_piece(target_position)
@@ -123,13 +123,13 @@ class Game:
                 piece_name = self.__input.get_pawn_promotion_input().lower()
                 new_piece = None
                 if piece_name == 'queen':
-                    new_piece = Queen(target_position, color)
+                    new_piece = pieces.Queen(target_position, color)
                 elif piece_name == 'knight':
-                    new_piece = Knight(target_position, color)
+                    new_piece = pieces.Knight(target_position, color)
                 elif piece_name == 'rook':
-                    new_piece = Rook(target_position, color)
+                    new_piece = pieces.Rook(target_position, color)
                 elif piece_name == 'bishop':
-                    new_piece = Bishop(target_position, color)
+                    new_piece = pieces.Bishop(target_position, color)
                 else:
                     print('Invalid piece name')
                     continue
@@ -163,17 +163,17 @@ class Game:
                     break
 
                 board_cell = board.get(possible_position)
-                if isinstance(board_cell, Piece):
+                if isinstance(board_cell, pieces.Piece):
                     if board_cell.get_color() == self.__current_player_color:
                         break
-                    if type(board_cell) is Pawn:
+                    if type(board_cell) is pieces.Pawn:
                         break
                     directions.append(possible_position)
                     break
 
                 directions.append(possible_position)
 
-        if type(piece) is Pawn:
+        if type(piece) is pieces.Pawn:
             enemy_coords = self.__get_pawn_enemy_coordinates(piece, board)
             directions.extend(enemy_coords)
 
@@ -227,7 +227,8 @@ class Game:
         if king.is_moved():
             return castling_positions
 
-        rooks = {k: v for k, v in board.items() if type(v) is Rook and not v.is_moved() and v.get_color() == color}
+        rooks = {k: v for k, v in board.items() if type(v) is pieces.Rook
+                 and not v.is_moved() and v.get_color() == color}
         rooks = list(rooks.values())
 
         print(rooks)
