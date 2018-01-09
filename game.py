@@ -5,6 +5,7 @@ from const import Colors
 from exceptions import *
 from utils import transform_coordinates
 import os
+from helpers import are_coordinates_in_bounds
 
 
 class Game:
@@ -34,7 +35,7 @@ class Game:
 
             piece = self.__get_piece(board, player)
 
-            movement_paths = self.__compute_movement_paths(board, piece)
+            movement_paths = piece.get_available_cells()
 
             self.__output.render(board, piece, movement_paths)
 
@@ -160,7 +161,7 @@ class Game:
                 x1, y1 = possible_position
                 possible_position = (x1 + x, y1 + y)
 
-                if not self.__are_coordinates_in_bounds(possible_position):
+                if not are_coordinates_in_bounds(possible_position):
                     break
 
                 board_cell = board.get(possible_position)
@@ -184,7 +185,7 @@ class Game:
         enemy_coords = []
 
         def add_enemy(possible_enemy_coords):
-            if not self.__are_coordinates_in_bounds(possible_enemy_coords):
+            if not are_coordinates_in_bounds(possible_enemy_coords):
                 return
 
             cell = board.get(possible_enemy_coords)
@@ -237,8 +238,3 @@ class Game:
             return castling_positions
 
         return castling_positions
-
-    @staticmethod
-    def __are_coordinates_in_bounds(coordinates):
-        x, y = coordinates
-        return x < 8 or x >= 0 or y < 8 or y >= 0

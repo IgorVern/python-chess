@@ -1,3 +1,6 @@
+from helpers import are_coordinates_in_bounds
+
+
 class Piece(object):
     def __init__(self, board, directions, coordinates, color, step=7):
         self.__did_move = False
@@ -33,3 +36,40 @@ class Piece(object):
 
     def get_step(self):
         return self.__step
+
+    def get_board(self):
+        return self.__board
+
+    def get_available_cells(self):
+        board = self.__board.get_board()
+        movement_directions = self.__directions
+        step = self.__step
+        current_position = self.__coordinates
+        directions = []
+
+        for direction in movement_directions:
+            possible_position = current_position
+            x, y = direction
+            for i in range(0, step):
+                x1, y1 = possible_position
+                possible_position = (x1 + x, y1 + y)
+
+                if not are_coordinates_in_bounds(possible_position):
+                    break
+
+                board_cell = board.get(possible_position)
+                if isinstance(board_cell, Piece):
+                    if board_cell.get_color() == self.__color:
+                        break
+                    # if type(board_cell) is pieces.Pawn:
+                    #     break
+                    directions.append(possible_position)
+                    break
+
+                directions.append(possible_position)
+        #
+        # if type(piece) is pieces.Pawn:
+        #     enemy_coords = self.__get_pawn_enemy_coordinates(piece, board)
+        #     directions.extend(enemy_coords)
+
+        return directions
