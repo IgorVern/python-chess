@@ -23,7 +23,7 @@ class Game:
         print('===== Welcome to python chess! =====')
         print(os.linesep)
 
-    def start_game(self):
+    def start(self):
         while True:
             on_board_pieces = self.__board.get_on_board_pieces()
 
@@ -32,13 +32,14 @@ class Game:
             print(self.__current_turn_color + ' player turn')
 
             self.__pick_piece()
+
             piece = self.__picked_piece
 
             movement_paths = piece.get_available_cells()
 
             self.__output.render(on_board_pieces, piece, movement_paths)
 
-            self.__move_piece(on_board_pieces, piece, movement_paths)
+            self.__move_piece(on_board_pieces, movement_paths)
 
             if self.__game_is_ended:
                 print(self.__current_turn_color + ' wins')
@@ -69,7 +70,8 @@ class Game:
             self.__picked_piece = piece
             break
 
-    def __move_piece(self, board, piece, movement_paths):
+    def __move_piece(self, board, movement_paths):
+        piece = self.__picked_piece
         while True:
             try:
                 target_position = self.__input.get_user_input('Move piece:' + os.linesep)
@@ -95,6 +97,7 @@ class Game:
             else:
                 piece.move(target_position)
 
+            self.__picked_piece = None
             break
 
     def __kill_someone(self, board, target_position):
