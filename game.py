@@ -1,6 +1,5 @@
 import pieces
 from board import Board
-from player import Player
 from const import Colors
 from exceptions import *
 from utils import transform_coordinates
@@ -15,11 +14,11 @@ class Game:
         self.__board = board
         self.__output = user_output
         self.__input = user_input
-        self.__players = {Colors.white: Player(board, Colors.white), Colors.black: Player(board, Colors.black)}
-        self.__current_player_color = Colors.white
+        self.__current_turn_color = Colors.white
         self.__game_is_ended = False
         self.__en_passant_pawn = None
         self.__pawn_was_promoted = False
+        self.__picked_piece = None
         print(os.linesep)
         print('===== Welcome to python chess! =====')
         print(os.linesep)
@@ -27,28 +26,29 @@ class Game:
     def start_game(self):
         while True:
             board = self.__board.get_board()
-            player = self.__players.get(self.__current_player_color)
 
             self.__output.render(board)
 
-            print(self.__current_player_color + ' player turn')
+            print(self.__current_turn_color + ' player turn')
 
-            piece = self.__get_piece(board, player)
+            self.__pick_piece()
+            piece = self.__picked_piece
 
             movement_paths = piece.get_available_cells()
 
             self.__output.render(board, piece, movement_paths)
 
-            self.__move_piece(board, piece, player, movement_paths)
+            self.__move_piece(board, piece, movement_paths)
 
             if self.__game_is_ended:
-                print(self.__current_player_color + ' wins')
+                print(self.__current_turn_color + ' wins')
                 break
 
-            self.__switch_player()
+            self.__switch_turn()
 
-    # TODO   move cell validation logic in game class. Game rules determine players behavior
-    def __get_piece(self, board, player):
+    def __pick_piece(self):
+        board = self.__board.get_board()
+
         while True:
             try:
                 piece_coordinates = self.__input.get_user_input('Pick a piece:' + os.linesep)
@@ -58,15 +58,18 @@ class Game:
 
             piece = board.get(piece_coordinates)
 
-            try:
-                player.pick_piece(piece)
-                return piece
-            except WrongPieceException:
-                print(transform_coordinates(piece_coordinates) + ' is not your piece')
-            except EmptyCellException:
+            if not isinstance(piece, pieces.Piece):
                 print('There is no piece at ' + transform_coordinates(piece_coordinates))
+                continue
 
-    def __move_piece(self, board, piece, player, movement_paths):
+            if piece.get_color() is not self.__current_turn_color:
+                print(transform_coordinates(piece_coordinates) + ' is not your piece')
+                continue
+
+            self.__picked_piece = piece
+            break
+
+    def __move_piece(self, board, piece, movement_paths):
         while True:
             try:
                 target_position = self.__input.get_user_input('Move piece:' + os.linesep)
@@ -90,7 +93,7 @@ class Game:
             if self.__pawn_was_promoted:
                 self.__pawn_was_promoted = False
             else:
-                player.move_piece(target_position)
+                piece.move(target_position)
 
             break
 
@@ -108,7 +111,7 @@ class Game:
         """determine if there was an en passant move"""
         if self.__en_passant_pawn:
             x, y = self.__en_passant_pawn.get_position()
-            en_passant_coords = (x, y - 1 if self.__current_player_color == Colors.white else y + 1)
+            en_passant_coords = (x, y - 1 if self.__current_turn_color == Colors.white else y + 1)
             if en_passant_coords in movement_paths:
                 tp = en_passant_coords
                 self.__board.remove_piece((x, y))
@@ -118,20 +121,20 @@ class Game:
 
     def __promote_pawn(self, pawn, target_position):
         x, y = target_position
-        color = self.__current_player_color
-
+        color = self.__current_turn_color
+        board = self.__board
         if y == 0 or y == 7:
             while True:
                 piece_name = self.__input.get_pawn_promotion_input().lower()
                 new_piece = None
                 if piece_name == 'queen':
-                    new_piece = pieces.Queen(target_position, color)
+                    new_piece = pieces.Queen(board, target_position, color)
                 elif piece_name == 'knight':
-                    new_piece = pieces.Knight(target_position, color)
+                    new_piece = pieces.Knight(board, target_position, color)
                 elif piece_name == 'rook':
-                    new_piece = pieces.Rook(target_position, color)
+                    new_piece = pieces.Rook(board, target_position, color)
                 elif piece_name == 'bishop':
-                    new_piece = pieces.Bishop(target_position, color)
+                    new_piece = pieces.Bishop(board, target_position, color)
                 else:
                     print('Invalid piece name')
                     continue
@@ -145,8 +148,8 @@ class Game:
         current_position = pawn.get_position()
         self.__en_passant_pawn = pawn if abs(target_position[1] - current_position[1]) == 2 else None
 
-    def __switch_player(self):
-        self.__current_player_color = Colors.white if self.__current_player_color == Colors.black else Colors.black
+    def __switch_turn(self):
+        self.__current_turn_color = Colors.white if self.__current_turn_color == Colors.black else Colors.black
 
     def __compute_movement_paths(self, board, piece):
         movement_directions = piece.get_movement_directions()
@@ -166,7 +169,7 @@ class Game:
 
                 board_cell = board.get(possible_position)
                 if isinstance(board_cell, pieces.Piece):
-                    if board_cell.get_color() == self.__current_player_color:
+                    if board_cell.get_color() == self.__current_turn_color:
                         break
                     if type(board_cell) is pieces.Pawn:
                         break
@@ -192,10 +195,10 @@ class Game:
             if cell is None:
                 return
 
-            if cell.get_color() != self.__current_player_color:
+            if cell.get_color() != self.__current_turn_color:
                 enemy_coords.append(possible_enemy_coords)
 
-        if self.__current_player_color == Colors.white:
+        if self.__current_turn_color == Colors.white:
             x, y = pawn.get_position()
 
             add_enemy((x - 1, y - 1))
@@ -213,9 +216,9 @@ class Game:
             x, y = current_position
             en_passant_coords = self.__en_passant_pawn.get_position()
             if en_passant_coords == (x - 1, y):
-                en_passant_hit_direction = (x - 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
+                en_passant_hit_direction = (x - 1, y - 1 if self.__current_turn_color == Colors.white else y + 1)
             elif en_passant_coords == (x + 1, y):
-                en_passant_hit_direction = (x + 1, y - 1 if self.__current_player_color == Colors.white else y + 1)
+                en_passant_hit_direction = (x + 1, y - 1 if self.__current_turn_color == Colors.white else y + 1)
 
             if en_passant_hit_direction and en_passant_hit_direction not in enemy_coords:
                 enemy_coords.append(en_passant_hit_direction)
@@ -224,7 +227,7 @@ class Game:
 
     def __get_castling_positions(self, king, board):
         castling_positions = []
-        color = self.__current_player_color
+        color = self.__current_turn_color
 
         if king.is_moved():
             return castling_positions

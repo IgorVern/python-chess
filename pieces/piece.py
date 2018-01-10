@@ -1,4 +1,5 @@
 from helpers import are_coordinates_in_bounds
+from exceptions import WrongPieceException, EmptyCellException, BoardOutOfBoundsException
 
 
 class Piece(object):
@@ -20,7 +21,9 @@ class Piece(object):
         if not self.__did_move:
             self.__did_move = True
 
+        self.__board.remove_piece(self.__coordinates)
         self.__coordinates = coordinates
+        self.__board.add_piece(self)
 
     def set_movement_directions(self, directions):
         self.__directions = directions
@@ -39,6 +42,12 @@ class Piece(object):
 
     def get_board(self):
         return self.__board
+
+    def validate_move(self, coordinates):
+        x, y = coordinates
+
+        if x < 0 or x > 7 or y < 0 or y > 7:
+            raise BoardOutOfBoundsException()
 
     def get_available_cells(self):
         board = self.__board.get_board()
