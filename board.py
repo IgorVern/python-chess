@@ -4,17 +4,16 @@ import pieces
 
 class Board:
     def __init__(self):
-        self.__board = None
+        self.__on_board_pieces = None
 
-    # TODO  name refactoring
-    def get_board(self):
-        return self.__board
+    def get_on_board_pieces(self):
+        return self.__on_board_pieces
 
     def remove_piece(self, piece_coords):
-        self.__board.pop(piece_coords)
+        self.__on_board_pieces.pop(piece_coords)
 
     def add_piece(self, piece):
-        self.__board[piece.get_position()] = piece
+        self.__on_board_pieces[piece.get_position()] = piece
 
     def fill_board(self):
         in_game_pieces = {}
@@ -60,4 +59,4 @@ class Board:
         """
             board is represented as a dictionary where values is a piece object, key - its coordinates tuple
         """
-        self.__board = in_game_pieces
+        self.__on_board_pieces = in_game_pieces

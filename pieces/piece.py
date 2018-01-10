@@ -50,7 +50,7 @@ class Piece(object):
             raise BoardOutOfBoundsException()
 
     def get_available_cells(self):
-        board = self.__board.get_board()
+        board = self.__board.get_on_board_pieces()
         movement_directions = self.__directions
         step = self.__step
         current_position = self.__coordinates

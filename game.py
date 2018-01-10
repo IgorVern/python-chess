@@ -25,9 +25,9 @@ class Game:
 
     def start_game(self):
         while True:
-            board = self.__board.get_board()
+            on_board_pieces = self.__board.get_on_board_pieces()
 
-            self.__output.render(board)
+            self.__output.render(on_board_pieces)
 
             print(self.__current_turn_color + ' player turn')
 
@@ -36,9 +36,9 @@ class Game:
 
             movement_paths = piece.get_available_cells()
 
-            self.__output.render(board, piece, movement_paths)
+            self.__output.render(on_board_pieces, piece, movement_paths)
 
-            self.__move_piece(board, piece, movement_paths)
+            self.__move_piece(on_board_pieces, piece, movement_paths)
 
             if self.__game_is_ended:
                 print(self.__current_turn_color + ' wins')
@@ -47,7 +47,7 @@ class Game:
             self.__switch_turn()
 
     def __pick_piece(self):
-        board = self.__board.get_board()
+        on_board_pieces = self.__board.get_on_board_pieces()
 
         while True:
             try:
@@ -56,7 +56,7 @@ class Game:
                 print('There is no such cell on board')
                 continue
 
-            piece = board.get(piece_coordinates)
+            piece = on_board_pieces.get(piece_coordinates)
 
             if not isinstance(piece, pieces.Piece):
                 print('There is no piece at ' + transform_coordinates(piece_coordinates))

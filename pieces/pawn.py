@@ -17,7 +17,7 @@ class Pawn(Piece):
 
     def get_available_cells(self):
         directions = super(Pawn, self).get_available_cells()
-        pieces_positions = self.get_board().get_board()
+        pieces_positions = self.get_board().get_on_board_pieces()
 
         # filter out possible enemy coordinates at the next cell in front of pawn
         directions = list(filter(lambda coords: coords not in pieces_positions, directions))
@@ -29,7 +29,7 @@ class Pawn(Piece):
 
     def __get_pawn_enemy_coordinates(self, ):
         enemy_coords = []
-        board = self.get_board().get_board()
+        board = self.get_board().get_on_board_pieces()
 
         def add_enemy(possible_enemy_coords):
             if not are_coordinates_in_bounds(possible_enemy_coords):
