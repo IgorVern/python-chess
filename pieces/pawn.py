@@ -1,6 +1,6 @@
 from .piece import Piece
 from const import Colors
-from helpers import are_coordinates_in_bounds
+from utils import are_coordinates_in_bounds
 
 
 class Pawn(Piece):

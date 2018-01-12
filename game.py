@@ -2,9 +2,8 @@ import pieces
 from board import Board
 from const import Colors
 from exceptions import *
-from utils import transform_coordinates
+from utils import transform_coordinates, are_coordinates_in_bounds
 import os
-from helpers import are_coordinates_in_bounds
 
 
 class Game:
@@ -36,6 +35,10 @@ class Game:
             piece = self.__picked_piece
 
             movement_paths = piece.get_available_cells()
+            if not movement_paths:
+                print('No available moves for ' + str(piece))
+                self.__picked_piece = None
+                continue
 
             self.__output.render(on_board_pieces, piece, movement_paths)
 
@@ -154,38 +157,6 @@ class Game:
     def __switch_turn(self):
         self.__current_turn_color = Colors.white if self.__current_turn_color == Colors.black else Colors.black
 
-    def __compute_movement_paths(self, board, piece):
-        movement_directions = piece.get_movement_directions()
-        step = piece.get_step()
-        current_position = piece.get_position()
-        directions = []
-
-        for direction in movement_directions:
-            possible_position = current_position
-            x, y = direction
-            for i in range(0, step):
-                x1, y1 = possible_position
-                possible_position = (x1 + x, y1 + y)
-
-                if not are_coordinates_in_bounds(possible_position):
-                    break
-
-                board_cell = board.get(possible_position)
-                if isinstance(board_cell, pieces.Piece):
-                    if board_cell.get_color() == self.__current_turn_color:
-                        break
-                    if type(board_cell) is pieces.Pawn:
-                        break
-                    directions.append(possible_position)
-                    break
-
-                directions.append(possible_position)
-
-        if type(piece) is pieces.Pawn:
-            enemy_coords = self.__get_pawn_enemy_coordinates(piece, board)
-            directions.extend(enemy_coords)
-
-        return directions
 
     def __get_pawn_enemy_coordinates(self, pawn, board):
         enemy_coords = []
