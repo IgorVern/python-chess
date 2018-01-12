@@ -2,7 +2,7 @@ import pieces
 from board import Board
 from const import Colors
 from exceptions import *
-from utils import transform_coordinates, are_coordinates_in_bounds
+from utils import transform_coordinates
 import os
 
 
@@ -35,6 +35,7 @@ class Game:
             piece = self.__picked_piece
 
             movement_paths = piece.get_available_cells()
+
             if not movement_paths:
                 print('No available moves for ' + str(piece))
                 self.__picked_piece = None
@@ -49,6 +50,9 @@ class Game:
                 break
 
             self.__switch_turn()
+
+    def get_en_passant_pawn(self):
+        return self.__en_passant_pawn
 
     def __pick_piece(self):
         on_board_pieces = self.__board.get_on_board_pieces()
@@ -88,17 +92,7 @@ class Game:
 
             self.__kill_someone(board, target_position)
 
-            if type(piece) is pieces.Pawn:
-                target_position = self.__get_pawn_eventual_position(movement_paths, target_position)
-                self.__set_en_passant_piece(piece, target_position)
-                self.__promote_pawn(piece, target_position)
-            else:
-                self.__en_passant_pawn = None
-
-            if self.__pawn_was_promoted:
-                self.__pawn_was_promoted = False
-            else:
-                piece.move(target_position)
+            piece.move(target_position)
 
             self.__picked_piece = None
             break
@@ -149,69 +143,5 @@ class Game:
                 self.__pawn_was_promoted = True
                 break
 
-    def __set_en_passant_piece(self, pawn, target_position):
-        """is piece suitable for en passant move"""
-        current_position = pawn.get_position()
-        self.__en_passant_pawn = pawn if abs(target_position[1] - current_position[1]) == 2 else None
-
     def __switch_turn(self):
         self.__current_turn_color = Colors.white if self.__current_turn_color == Colors.black else Colors.black
-
-
-    def __get_pawn_enemy_coordinates(self, pawn, board):
-        enemy_coords = []
-
-        def add_enemy(possible_enemy_coords):
-            if not are_coordinates_in_bounds(possible_enemy_coords):
-                return
-
-            cell = board.get(possible_enemy_coords)
-            if cell is None:
-                return
-
-            if cell.get_color() != self.__current_turn_color:
-                enemy_coords.append(possible_enemy_coords)
-
-        if self.__current_turn_color == Colors.white:
-            x, y = pawn.get_position()
-
-            add_enemy((x - 1, y - 1))
-            add_enemy((x + 1, y - 1))
-        else:
-            x, y = pawn.get_position()
-
-            add_enemy((x - 1, y + 1))
-            add_enemy((x + 1, y + 1))
-
-        """compute pawn en passant move"""
-        if self.__en_passant_pawn is not None:
-            current_position = pawn.get_position()
-            en_passant_hit_direction = None
-            x, y = current_position
-            en_passant_coords = self.__en_passant_pawn.get_position()
-            if en_passant_coords == (x - 1, y):
-                en_passant_hit_direction = (x - 1, y - 1 if self.__current_turn_color == Colors.white else y + 1)
-            elif en_passant_coords == (x + 1, y):
-                en_passant_hit_direction = (x + 1, y - 1 if self.__current_turn_color == Colors.white else y + 1)
-
-            if en_passant_hit_direction and en_passant_hit_direction not in enemy_coords:
-                enemy_coords.append(en_passant_hit_direction)
-
-        return enemy_coords
-
-    def __get_castling_positions(self, king, board):
-        castling_positions = []
-        color = self.__current_turn_color
-
-        if king.is_moved():
-            return castling_positions
-
-        rooks = {k: v for k, v in board.items() if type(v) is pieces.Rook
-                 and not v.is_moved() and v.get_color() == color}
-        rooks = list(rooks.values())
-
-        print(rooks)
-        if not rooks:
-            return castling_positions
-
-        return castling_positions

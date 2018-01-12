@@ -13,6 +13,8 @@ class Pawn(Piece):
         if not did_move:
             self.set_step(1)
 
+        if self.__is_en_passant_move(coordinates):
+            self.get_board()
         super(Pawn, self).move(coordinates)
 
     def get_available_cells(self):
@@ -26,6 +28,11 @@ class Pawn(Piece):
         directions.extend(enemy_coords)
 
         return directions
+
+    def __is_en_passant_move(self, target_position):
+        target_y = target_position[1]
+        current_y = self.get_position()[1]
+        self.__en_passant_pawn = self if abs(target_y - current_y) == 2 else None
 
     def __get_pawn_enemy_coordinates(self, ):
         enemy_coords = []
